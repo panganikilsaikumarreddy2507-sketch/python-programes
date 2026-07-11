@@ -1,0 +1,6 @@
+a= int(input("enter no1:"))
+b=int(input("enter no2:"))
+c=int(input("enter no3:"))
+d=int(input("enter no4:"))
+print(a,b,c,d,sep='')
+print(f"{a}{b}{c}{d}")

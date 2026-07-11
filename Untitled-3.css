@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Tech Book Hub | EduLib</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        /* Custom Variables */
+        :root {
+            --primary-navy: #003366;
+            --accent-orange: #ff6600;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-light: #e9ecef;
+            --text-dark: #343a40;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Base Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            display: flex; /* Enables flexbox for main layout */
+            min-height: 100vh; /* Ensures full viewport height */
+        }
+
+        /* Dark Mode Styling (controlled by a class on body) */
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+        body.dark-mode .navbar { background-color: #1a1e22; }
+        body.dark-mode .form-control { background-color: #343a40; border-color: #495057; color: var(--text-light); }
+        body.dark-mode .form-control::placeholder { color: #ced4da; }
+        body.dark-mode .card { background-color: #343a40; color: var(--text-light); border-color: #495057; }
+        body.dark-mode .card-text { color: var(--text-light); }
+        body.dark-mode .list-group-item { background-color: #343a40; color: var(--text-light); border-color: #495057; }
+        body.dark-mode .accordion-button { background-color: #343a40; color: var(--text-light); }
+        body.dark-mode .accordion-button:not(.collapsed) { background-color: #2b3035; color: var(--text-light); }
+
+
+        /* Navigation Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-navy);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px var(--card-shadow);
+            flex-shrink: 0; /* Prevents sidebar from shrinking */
+        }
+        .sidebar .navbar-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            display: block; /* For proper spacing */
+            text-align: center;
+        }
+        .sidebar .nav-link {
+            color: var(--text-light);
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--accent-orange);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        .semester-filter {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .semester-filter label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .semester-filter .form-check-label {
+            color: var(--text-light);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1; /* Allows main content to take remaining space */
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stacks header and book grid vertically */
+        }
+
+        /* Dynamic Header */
+        .dynamic-header {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--card-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dynamic-header .search-input {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+        .dynamic-header .icon-group i {
+            font-size: 1.4rem;
+            margin-left: 15px;
+            cursor: pointer;
+            color: var(--primary-navy);
+            transition: color 0.2s;
+        }
+        .dynamic-header .icon-group i:hover {
+            color: var(--accent-orange);
+        }
+        .dynamic-header .form-control {
+            border-radius: 50px;
+            padding: 10px 20px;
+            border: 1px solid #ced4da;
+        }
+
+        /* Book Grid */
+        .book-grid-section {
+            flex-grow: 1;
+            padding-bottom: 20px; /* Space for potential footer or bottom content */
+        }
+        .book-card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--card-shadow);
+            overflow: hidden; /* Ensures image corners are rounded */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 100%; /* Ensures cards in a row have equal height */
+            display: flex;
+            flex-direction: column;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px var(--card-hover-shadow);
+        }
+        .book-card img {
+            width: 100%;
+            height: 200px; /* Fixed height for book covers */
+            object-fit: cover; /* Ensures image fills the space without distortion */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .book-card .card-body {
+            padding: 15px;
+            flex-grow: 1; /* Allows body to expand */
+        }
+        .book-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        .book-card .card-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .book-card .rating .bi-star-fill {
+            color: #ffc107; /* Bootstrap yellow star */
+            font-size: 0.9rem;
+        }
+        .book-card .tag-badge {
+            font-size: 0.75rem;
+            padding: 0.3em 0.6em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        /* Resource Drawer (initially hidden) */
+        .resource-drawer {
+            width: 350px; /* Fixed width for the drawer */
+            background-color: white;
+            box-shadow: -2px 0 8px var(--card-shadow);
+            padding: 20px;
+            flex-shrink: 0;
+            display: none; /* Hide by default */
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%); /* Position off-screen */
+        }
+        .resource-drawer.show {
+            display: block; /* Make visible */
+            transform: translateX(0); /* Slide into view */
+        }
+        body.dark-mode .resource-drawer {
+            background-color: #343a40;
+            color: var(--text-light);
+        }
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        body.dark-mode .drawer-header { border-bottom-color: #495057; }
+        .drawer-header h5 { margin-bottom: 0; }
+        .drawer-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        .drawer-header .close-btn:hover { color: var(--accent-orange); }
+
+        .drawer-book-cover {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .syllabus-mapping .accordion-item {
+            border: none;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .syllabus-mapping .accordion-button {
+            font-weight: 600;
+            padding: 10px 15px;
+            background-color: #f1f3f5;
+            border-radius: 5px !important;
+        }
+        body.dark-mode .syllabus-mapping .accordion-button { background-color: #495057; }
+        .syllabus-mapping .accordion-body {
+            padding: 15px;
+            background-color: var(--light-bg);
+            border-top: 1px solid #e9ecef;
+        }
+        body.dark-mode .syllabus-mapping .accordion-body { background-color: #3f444a; border-top-color: #495057; }
+        .syllabus-mapping .accordion-body ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        /* Utility for quick demo */
+        .d-none { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <a class="navbar-brand" href="#">EduLib</a>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 nav-link active">
+                <i class="bi bi-pc-display"></i> Computer Science
+            </a>
+            <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 nav-link">
+                <i class="bi bi-cpu"></i> Electronics
+            </a>
+            <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 nav-link">
+                <i class="bi bi-gear"></i> Mechanical
+            </a>
+            <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 nav-link">
+                <i class="bi bi-tools"></i> Civil
+            </a>
+            <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 nav-link">
+                <i class="bi bi-lightbulb"></i> Artificial Intelligence
+            </a>
+        </div>
+
+        <div class="semester-filter">
+            <label class="text-white">Semester</label>
+            <div class="form-check text-white">
+                <input class="form-check-input" type="radio" name="semester" id="sem1" checked>
+                <label class="form-check-label" for="sem1">Sem 1-2</label>
+            </div>
+            <div class="form-check text-white">
+                <input class="form-check-input" type="radio" name="semester" id="sem3">
+                <label class="form-check-label" for="sem3">Sem 3-4</label>
+            </div>
+            <div class="form-check text-white">
+                <input class="form-check-input" type="radio" name="semester" id="sem5">
+                <label class="form-check-label" for="sem5">Sem 5-6</label>
+            </div>
+            <div class="form-check text-white">
+                <input class="form-check-input" type="radio" name="semester" id="sem7">
+                <label class="form-check-label" for="sem7">Sem 7-8</label>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="dynamic-header">
+            <div class="input-group search-input">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control border-start-0" placeholder="Search by title, author, or keyword...">
+            </div>
+            <div class="icon-group d-flex align-items-center">
+                <i class="bi bi-moon" id="darkModeToggle"></i>
+                <i class="bi bi-person-circle"></i>
+            </div>
+        </header>
+
+        <section class="book-grid-section">
+            <h3 class="mb-4 text-primary">Trending Textbooks</h3>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="bookGrid">
+                <div class="col">
+                    <div class="card book-card" onclick="showResourceDrawer('Data Structures & Algorithms', 'Narasimha Karumanchi', 'cse-datastructures.jpg', ['Unit 1: Intro to Data Structures', 'Unit 2: Trees & Graphs', 'Unit 3: Sorting & Searching'])">
+                        <img src="https://via.placeholder.com/150x200?text=Data+Structures" class="card-img-top" alt="Data Structures Book Cover">
+                        <div class="card-body">
+                            <h5 class="card-title">Data Structures & Algorithms Made Easy</h5>
+                            <p class="card-text">Narasimha Karumanchi</p>
+                            <div class="rating mb-2">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> (4.0)
+                            </div>
+                            <span class="badge bg-primary tag-badge">CSE</span>
+                            <span class="badge bg-success tag-badge">PDF Available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card book-card">
+                        <img src="https://via.placeholder.com/150x200?text=Engg+Thermodynamics" class="card-img-top" alt="Engineering Thermodynamics Book Cover">
+                        <div class="card-body">
+                            <h5 class="card-title">Engineering Thermodynamics</h5>
+                            <p class="card-text">P.K. Nag</p>
+                            <div class="rating mb-2">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i> (4.5)
+                            </div>
+                            <span class="badge bg-warning text-dark tag-badge">Mechanical</span>
+                            <span class="badge bg-info text-dark tag-badge">University Recommended</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card book-card">
+                        <img src="https://via.placeholder.com/150x200?text=Signals+Systems" class="card-img-top" alt="Signals and Systems Book Cover">
+                        <div class="card-body">
+                            <h5 class="card-title">Signals and Systems</h5>
+                            <p class="card-text">Alan V. Oppenheim</p>
+                            <div class="rating mb-2">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i> (5.0)
+                            </div>
+                            <span class="badge bg-danger tag-badge">ECE</span>
+                            <span class="badge bg-secondary tag-badge">Classic</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card book-card">
+                        <img src="https://via.placeholder.com/150x200?text=Reinforced+Concrete" class="card-img-top" alt="Reinforced Concrete Book Cover">
+                        <div class="card-body">
+                            <h5 class="card-title">Reinforced Concrete Design</h5>
+                            <p class="card-text">P.C. Varghese</p>
+                            <div class="rating mb-2">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i> (3.0)
+                            </div>
+                            <span class="badge bg-info text-dark tag-badge">Civil</span>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+        </section>
+    </div>
+
+    <aside class="resource-drawer" id="resourceDrawer">
+        <div class="drawer-header">
+            <h5 id="drawerBookTitle">Book Details</h5>
+            <button type="button" class="btn-close close-btn" onclick="hideResourceDrawer()"></button>
+        </div>
+        <img src="https://via.placeholder.com/250x300?text=Book+Cover" class="drawer-book-cover" id="drawerBookCover" alt="Book Cover">
+        <p class="text-muted small" id="drawerBookAuthor">Author Name</p>
+        <p id="drawerSyllabusMappingDesc" class="mb-3">Syllabus Mapping (VTU - CSE, 3rd Sem)</p>
+
+        <div class="accordion syllabus-mapping" id="syllabusAccordion">
+            </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <button class="btn btn-primary w-50 me-2"><i class="bi bi-book me-2"></i>Read Now</button>
+            <button class="btn btn-outline-secondary w-50"><i class="bi bi-download me-2"></i>Download PDF</button>
+        </div>
+    </aside>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Dark Mode Toggle ---
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const icon = this;
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('bi-moon');
+                icon.classList.add('bi-sun');
+            } else {
+                icon.classList.remove('bi-sun');
+                icon.classList.add('bi-moon');
+            }
+        });
+
+        // --- Resource Drawer Logic ---
+        function showResourceDrawer(title, author, coverImg, syllabusUnits) {
+            const drawer = document.getElementById('resourceDrawer');
+            document.getElementById('drawerBookTitle').innerText = title;
+            document.getElementById('drawerBookAuthor').innerText = author;
+            document.getElementById('drawerBookCover').src = `https://via.placeholder.com/250x300?text=${coverImg.replace('.jpg', '').replace(/ /g, '+')}`; // Dynamic placeholder
+            
+            const accordion = document.getElementById('syllabusAccordion');
+            accordion.innerHTML = ''; // Clear previous content
+
+            syllabusUnits.forEach((unit, index) => {
+                const itemId = `collapse${index}`;
+                const accordionItem = `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading${itemId}">
+                            <button class="accordion-button ${index !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#${itemId}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="${itemId}">
+                                Unit ${index + 1}: ${unit.split(':')[0]}
+                            </button>
+                        </h2>
+                        <div id="${itemId}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" aria-labelledby="heading${itemId}" data-bs-parent="#syllabusAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>${unit}</li>
+                                    </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                accordion.innerHTML += accordionItem;
+            });
+
+            drawer.classList.add('show'); // Show the drawer
+        }
+
+        function hideResourceDrawer() {
+            document.getElementById('resourceDrawer').classList.remove('show'); // Hide the drawer
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+a,b=map(int,input("ENTER THE OPERAND VALUES").SPLIT())
+print("sum",a+b)
+print("sub"a-b)
+print("product",a*b)
+print("integer division",a//b)
+print("float",a/b)
+print("remainder",a%b)
+print("power",a*)
